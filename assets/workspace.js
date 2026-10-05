@@ -1,6 +1,13 @@
 import { validateProfile, compareProfiles, demoProfile } from "./profiles.js";
 const key = "roomscope.profiles.v1";
 const state = { a: null, b: null };
+const generations = { a: 0, b: 0 };
+function cancelImports() {
+  for (const slot of ["a", "b"]) {
+    generations[slot]++;
+    document.getElementById(`file-${slot}`).value = "";
+  }
+}
 const status = document.getElementById("status");
 const format = (n) => `${n > 0 ? "+" : ""}${n.toFixed(2)}`;
 function notify(message, error = false) {
@@ -165,23 +172,23 @@ function render() {
       .join("\n") || "PEQ-предложения появятся после загрузки профиля.";
 }
 for (const slot of ["a", "b"]) {
-  let generation = 0;
   document
     .getElementById(`file-${slot}`)
     .addEventListener("change", async (event) => {
       const file = event.target.files[0];
       if (!file) return;
-      const current = ++generation;
+      const current = ++generations[slot];
       try {
         if (file.size > 1024 * 1024)
           throw new Error("Файл слишком большой. Максимум 1 МБ.");
         const profile = validateProfile(JSON.parse(await file.text()));
-        if (current !== generation) return;
+        if (current !== generations[slot]) return;
         state[slot] = profile;
         notify(`Профиль ${slot.toUpperCase()} загружен.`);
         render();
         persist();
       } catch (error) {
+        if (current !== generations[slot]) return;
         notify(
           error instanceof SyntaxError
             ? "Не удалось прочитать JSON. Проверьте файл; предыдущий профиль сохранён."
@@ -189,7 +196,7 @@ for (const slot of ["a", "b"]) {
           true,
         );
       } finally {
-        event.target.value = "";
+        if (current === generations[slot]) event.target.value = "";
       }
     });
   document
@@ -214,6 +221,7 @@ for (const slot of ["a", "b"]) {
   });
 }
 document.getElementById("demo").addEventListener("click", () => {
+  cancelImports();
   state.a = demoProfile("A");
   state.b = demoProfile("B");
   notify(
@@ -223,6 +231,7 @@ document.getElementById("demo").addEventListener("click", () => {
   persist();
 });
 document.getElementById("clear").addEventListener("click", () => {
+  cancelImports();
   state.a = null;
   state.b = null;
   notify("Профили очищены. Загрузите JSON или демо, чтобы начать.");

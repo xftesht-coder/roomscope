@@ -39,6 +39,8 @@ export function validateProfile(data) {
     (data.roomscope_version === "0.2" ? "legacy-peak-normalized" : null);
   if (!["sweep-relative", "legacy-peak-normalized"].includes(reference))
     throw new Error("Неизвестная система отсчёта уровня.");
+  if (data.response.unit !== undefined && data.response.unit !== "dB")
+    throw new Error("Несовместимые единицы уровня: ожидается dB.");
   if (
     data.label != null &&
     (typeof data.label !== "string" || data.label.length > 120)

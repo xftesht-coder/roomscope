@@ -50,3 +50,13 @@ test("legacy 0.2 remains importable but never silently mixes with 0.3", () => {
   );
   assert.throws(() => compareProfiles(old, demoProfile()));
 });
+
+test("rejects explicit incompatible units while accepting older implicit dB", () => {
+  const profile = demoProfile();
+  for (const unit of ["Pa", "dB SPL", "", null]) {
+    profile.response.unit = unit;
+    assert.throws(() => validateProfile(profile), /единиц/);
+  }
+  delete profile.response.unit;
+  assert.equal(validateProfile(profile).response.unit, "dB");
+});

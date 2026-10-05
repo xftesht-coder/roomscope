@@ -88,6 +88,51 @@ test("loads the profile produced by the Python pipeline", async ({ page }) => {
   await expect(page.locator('[data-slot="a"] .meta')).toContainText("29 полос");
   await expect(page.locator("#chart")).toBeVisible();
 });
+
+test("clear and demo supersede pending imports, including failed reads", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    File.prototype.text = function () {
+      return new Promise((resolve) => {
+        window.finishImport = resolve;
+      });
+    };
+  });
+  for (const action of ["clear", "demo"]) {
+    for (const content of [
+      JSON.stringify({ ...demoProfile(), label: "stale" }),
+      "{broken",
+    ]) {
+      await upload(page, "a", demoProfile());
+      await page.waitForFunction(
+        () => typeof window.finishImport === "function",
+      );
+      await page.locator(`#${action}`).click();
+      const message = await page.getByRole("status").textContent();
+      await page.evaluate(async (value) => {
+        window.finishImport(value);
+        delete window.finishImport;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }, content);
+      await expect(page.locator("#label-a")).toHaveValue(
+        action === "clear" ? "" : "Демо · позиция A",
+      );
+      await expect(page.getByRole("status")).toHaveText(message);
+      await page.reload();
+      await expect(page.locator("#label-a")).toHaveValue(
+        action === "clear" ? "" : "Демо · позиция A",
+      );
+      await page.evaluate(() => {
+        File.prototype.text = function () {
+          return new Promise((resolve) => {
+            window.finishImport = resolve;
+          });
+        };
+      });
+    }
+  }
+});
 test("corrupt storage recovers; blocked storage still supports comparison", async ({
   page,
 }) => {
