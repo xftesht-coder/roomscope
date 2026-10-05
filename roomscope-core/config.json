@@ -1,0 +1,13 @@
+{
+  "sample_rate": 48000,
+  "f_start": 20.0,
+  "f_end": 20000.0,
+  "duration": 10.0,
+  "amplitude": 0.1,
+  "channels_in": 1,
+  "input_device": null,
+  "output_device": null,
+  "mode": "synthetic",
+  "tail_duration": 1.0,
+  "seed": 0
+}
