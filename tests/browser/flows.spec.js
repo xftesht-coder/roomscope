@@ -1,15 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { demoProfile } from "../../assets/profiles.js";
 const upload = (page, slot, value) =>
-  page
-    .locator(`#file-${slot}`)
-    .setInputFiles({
-      name: "profile.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(
-        typeof value === "string" ? value : JSON.stringify(value),
-      ),
-    });
+  page.locator(`#file-${slot}`).setInputFiles({
+    name: "profile.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(
+      typeof value === "string" ? value : JSON.stringify(value),
+    ),
+  });
 test.beforeEach(async ({ page }) => {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
