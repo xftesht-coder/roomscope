@@ -3,3 +3,17 @@ working-copy/
 *.bak
 _server_*
 _new.html
+
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.test-tmp/
+dist/
+test-results/
+playwright-report/
+public/downloads/
+roomscope-core/output/
+roomscope-core/profiles/
+*.wav
+*.log

@@ -4,217 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ROOM·SCOPE — дорожная карта AR-акустического калибратора</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0b0e13; --bg2:#0e1218; --panel:#12171f; --panel2:#161c26;
-    --line:rgba(236,233,225,.08); --line2:rgba(236,233,225,.16);
-    --ink:#ece9e1; --muted:#878d97; --faint:#565c66;
-    --teal:#57c9a8; --teal-dim:rgba(87,201,168,.16);
-    --amber:#e0913f; --amber-dim:rgba(224,145,63,.15);
-    --red:#df6a45; --red-dim:rgba(223,106,69,.15);
-    --disp:'Bricolage Grotesque',sans-serif;
-    --body:'IBM Plex Sans',sans-serif;
-    --mono:'IBM Plex Mono',monospace;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    background:var(--bg);color:var(--ink);font-family:var(--body);
-    font-weight:300;line-height:1.55;overflow-x:hidden;
-    -webkit-font-smoothing:antialiased;
-  }
-  #ambient{position:fixed;inset:0;z-index:0;opacity:.5;pointer-events:none}
-  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 32px}
-  .mono{font-family:var(--mono)}
-  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;
-    text-transform:uppercase;color:var(--muted)}
-  .teal{color:var(--teal)} .amber{color:var(--amber)} .red{color:var(--red)}
-
-  /* topbar */
-  .topbar{position:sticky;top:0;z-index:30;background:rgba(11,14,19,.82);
-    border-bottom:1px solid var(--line);backdrop-filter:saturate(120%);}
-  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;
-    height:54px;gap:20px}
-  .brand{font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.02em}
-  .brand b{color:var(--teal)}
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
-    padding:5px 9px;border:1px solid var(--line2);color:var(--muted);
-    display:flex;align-items:center;gap:6px}
-  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);
-    box-shadow:0 0 8px var(--teal);animation:pulse 2.4s infinite}
-  .chip.warn .dot{background:var(--amber);box-shadow:0 0 8px var(--amber)}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-
-  /* dot nav */
-  .dotnav{position:fixed;right:22px;top:50%;transform:translateY(-50%);
-    z-index:25;display:flex;flex-direction:column;gap:14px}
-  .dotnav a{width:9px;height:9px;border:1px solid var(--faint);border-radius:50%;
-    display:block;transition:.25s;position:relative}
-  .dotnav a:hover{border-color:var(--teal)}
-  .dotnav a.on{background:var(--teal);border-color:var(--teal);
-    box-shadow:0 0 10px var(--teal-dim)}
-  .dotnav a span{position:absolute;right:18px;top:50%;transform:translateY(-50%);
-    font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);
-    white-space:nowrap;opacity:0;transition:.2s;pointer-events:none}
-  .dotnav a:hover span{opacity:1}
-
-  /* HERO — instrument panel, asymmetric */
-  .hero{padding:64px 0 40px;display:grid;grid-template-columns:1.15fr .85fr;
-    gap:40px;align-items:end}
-  .hero h1{font-family:var(--disp);font-weight:800;line-height:.92;
-    font-size:clamp(46px,7.4vw,104px);letter-spacing:-.02em}
-  .hero h1 em{font-style:normal;color:var(--teal);
-    text-shadow:0 0 40px var(--teal-dim)}
-  .hero .lede{margin-top:22px;max-width:46ch;color:var(--muted);font-size:16px}
-  .specgrid{margin-top:30px;display:grid;grid-template-columns:repeat(2,1fr);
-    gap:1px;background:var(--line);border:1px solid var(--line);max-width:480px}
-  .specgrid div{background:var(--bg);padding:12px 14px}
-  .specgrid .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;
-    color:var(--faint);text-transform:uppercase}
-  .specgrid .v{font-family:var(--mono);font-size:13px;color:var(--ink);margin-top:4px}
-  .scope{position:relative;border:1px solid var(--line);background:
-    linear-gradient(180deg,var(--panel),var(--bg2));padding:14px 14px 8px}
-  .scope .shead{display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:8px}
-  .scope .shead .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
-    color:var(--muted)}
-  .scope .shead .lvl{font-family:var(--mono);font-size:10.5px;color:var(--teal)}
-  #rta{width:100%;height:200px;display:block}
-  .scope .sfoot{display:flex;justify-content:space-between;font-family:var(--mono);
-    font-size:9.5px;color:var(--faint);letter-spacing:.1em;padding-top:6px}
-
-  .section{padding:78px 0;border-top:1px solid var(--line)}
-  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:46px;flex-wrap:wrap}
-  .sec-head .num{font-family:var(--mono);font-size:12px;color:var(--teal);
-    letter-spacing:.1em}
-  .sec-head h2{font-family:var(--disp);font-weight:800;font-size:clamp(30px,4.4vw,52px);
-    letter-spacing:-.015em;line-height:1}
-  .sec-head p{color:var(--muted);max-width:52ch;font-size:15px}
-
-  /* TIMELINE */
-  .tl{position:relative;padding-left:46px}
-  .tl .rail{position:absolute;left:13px;top:6px;bottom:6px;width:2px;
-    background:var(--line)}
-  .tl .fill{position:absolute;left:13px;top:6px;width:2px;background:var(--teal);
-    height:0;box-shadow:0 0 12px var(--teal-dim);transition:height .1s linear}
-  .phase{position:relative;padding:0 0 46px 30px}
-  .phase:last-child{padding-bottom:0}
-  .phase .node{position:absolute;left:-40px;top:2px;width:28px;height:28px;
-    border:1.5px solid var(--line2);background:var(--bg);display:grid;
-    place-items:center;font-family:var(--mono);font-size:11px;color:var(--muted);
-    transition:.3s}
-  .phase:hover .node{border-color:var(--teal);color:var(--teal);
-    box-shadow:0 0 16px var(--teal-dim);transform:scale(1.08)}
-  .phase.done .node{border-color:var(--teal);color:var(--teal)}
-  .phase .ptop{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .phase .ptop .tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-    text-transform:uppercase;padding:3px 8px;border:1px solid var(--line2);
-    color:var(--muted)}
-  .phase.now .tag{border-color:var(--teal);color:var(--teal)}
-  .phase.later .tag{border-color:var(--amber-dim);color:var(--amber)}
-  .phase h3{font-family:var(--disp);font-weight:600;font-size:23px;letter-spacing:-.01em}
-  .phase .desc{color:var(--muted);margin:10px 0 14px;max-width:64ch;font-size:14.5px}
-  .artifacts{display:flex;flex-wrap:wrap;gap:7px}
-  .artifacts span{font-family:var(--mono);font-size:11px;color:var(--ink);
-    background:var(--panel);border:1px solid var(--line);padding:5px 9px;
-    transition:.2s}
-  .artifacts span:hover{border-color:var(--line2);background:var(--panel2);
-    transform:translateY(-2px)}
-  .deps{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--faint);
-    letter-spacing:.04em}
-  .deps b{color:var(--amber);font-weight:500}
-
-  /* FINAL AR VIEWPORT */
-  .ar{position:relative;border:1px solid var(--line2);background:#07090c;
-    overflow:hidden;aspect-ratio:16/9}
-  .ar svg{position:absolute;inset:0;width:100%;height:100%}
-  .ar .scan{position:absolute;inset:0;
-    background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(87,201,168,.025) 3px 4px);
-    pointer-events:none}
-  .ar .vig{position:absolute;inset:0;pointer-events:none;
-    background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.55))}
-  .layer{position:absolute;inset:0;opacity:0;transition:opacity .5s;pointer-events:none}
-  .layer.on{opacity:1}
-  .marker{position:absolute;transform:translate(-50%,-50%);text-align:center}
-  .marker .ring{width:34px;height:34px;border:1.5px solid var(--teal);
-    border-radius:50%;margin:0 auto;position:relative;
-    box-shadow:0 0 14px var(--teal-dim)}
-  .marker .ring::after{content:'';position:absolute;inset:9px;border-radius:50%;
-    background:var(--teal);animation:pulse 2s infinite}
-  .marker .lbl{font-family:var(--mono);font-size:9.5px;color:var(--teal);
-    margin-top:6px;letter-spacing:.06em;white-space:nowrap;
-    text-shadow:0 1px 4px #000}
-  .marker .mini{width:78px;height:30px;margin:5px auto 0;border:1px solid var(--teal-dim);
-    background:rgba(8,12,16,.7)}
-  .blob{position:absolute;border-radius:50%;filter:blur(14px);mix-blend-mode:screen}
-  .arrow{position:absolute;transform:translate(-50%,-50%)}
-  .arrow svg{position:static;width:46px;height:46px;animation:bob 1.4s infinite ease-in-out}
-  .arrow .cap{font-family:var(--mono);font-size:10px;color:var(--amber);
-    text-align:center;margin-top:4px;text-shadow:0 1px 4px #000;white-space:nowrap}
-  @keyframes bob{0%,100%{transform:translateX(0)}50%{transform:translateX(8px)}}
-  .hud{position:absolute;font-family:var(--mono);font-size:10.5px;
-    letter-spacing:.05em;color:var(--teal);text-shadow:0 1px 4px #000;
-    line-height:1.7}
-  .hud.tl{top:16px;left:18px}
-  .hud.tr{top:16px;right:18px;text-align:right;color:var(--muted)}
-  .hud.bl{bottom:16px;left:18px;color:var(--muted)}
-  .hud .ok{color:var(--teal)} .hud .val{color:var(--ink)}
-  .hudlive{width:150px;height:34px;margin-top:6px;border:1px solid var(--line2);
-    background:rgba(8,12,16,.6)}
-  .ctrls{position:absolute;bottom:16px;right:18px;display:flex;gap:6px;
-    pointer-events:auto}
-  .ctrls button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
-    text-transform:uppercase;background:rgba(10,14,19,.7);color:var(--muted);
-    border:1px solid var(--line2);padding:7px 10px;cursor:pointer;transition:.2s}
-  .ctrls button:hover{color:var(--ink);border-color:var(--faint)}
-  .ctrls button.on{color:var(--bg);background:var(--teal);border-color:var(--teal)}
-  .ar .corner{position:absolute;width:18px;height:18px;border:1.5px solid var(--teal-dim)}
-  .ar .corner.a{top:10px;left:10px;border-right:0;border-bottom:0}
-  .ar .corner.b{top:10px;right:10px;border-left:0;border-bottom:0}
-  .ar .corner.c{bottom:10px;left:10px;border-right:0;border-top:0}
-  .ar .corner.d{bottom:10px;right:10px;border-left:0;border-top:0}
-
-  /* HARDWARE */
-  .hw{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
-    background:var(--line);border:1px solid var(--line)}
-  .hw .card{background:var(--bg);padding:20px 18px;transition:.25s;position:relative}
-  .hw .card:hover{background:var(--panel)}
-  .hw .card .role{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--faint)}
-  .hw .card h4{font-family:var(--disp);font-weight:600;font-size:18px;margin:8px 0 6px}
-  .hw .card .why{font-size:13px;color:var(--muted)}
-  .hw .card .st{position:absolute;top:16px;right:16px;font-family:var(--mono);
-    font-size:9.5px;letter-spacing:.08em;padding:3px 7px;border:1px solid var(--line2)}
-  .hw .card .st.buy{color:var(--teal);border-color:var(--teal-dim)}
-  .hw .card .st.gate{color:var(--amber);border-color:var(--amber-dim)}
-  .never{margin-top:18px;font-family:var(--mono);font-size:11.5px;color:var(--faint);
-    letter-spacing:.03em}
-  .never b{color:var(--red);font-weight:500}
-
-  footer{padding:50px 0 70px;border-top:1px solid var(--line)}
-  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;
-    font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em}
-
-  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s}
-  .reveal.in{opacity:1;transform:none}
-
-  @media(max-width:880px){
-    .hero{grid-template-columns:1fr;gap:30px}
-    .hw{grid-template-columns:repeat(2,1fr)}
-    .dotnav{display:none}
-    .wrap{padding:0 20px}
-  }
-  @media(max-width:520px){.hw{grid-template-columns:1fr}.specgrid{grid-template-columns:1fr}}
-</style>
+<link rel="stylesheet" href="assets/roadmap.css">
 </head>
 <body>
-<canvas id="ambient"></canvas>
+<a class="skip-link" href="#top">К содержимому</a>
+<canvas id="ambient" aria-hidden="true"></canvas>
 
-<nav class="dotnav" id="dotnav">
+<nav class="dotnav" id="dotnav" aria-label="Разделы проекта">
   <a href="#top" data-s="top"><span>ПАНЕЛЬ</span></a>
   <a href="#timeline" data-s="timeline"><span>ТАЙМЛАЙН</span></a>
   <a href="#final" data-s="final"><span>ФИНАЛ · AR</span></a>
@@ -224,14 +20,15 @@
 <header class="topbar">
   <div class="wrap">
     <div class="brand">ROOM<b>·</b>SCOPE <span class="mono" style="color:var(--faint);font-weight:400">/ ar acoustic calibrator</span></div>
-    <div class="chips">
+    <nav class="chips" aria-label="Основная навигация">
+      <a href="workspace.html" class="chip primary">Открыть лабораторию →</a>
       <span class="chip"><span class="dot"></span>XREAL Air 2 Ultra</span>
       <span class="chip warn"><span class="dot"></span>Beam Pro · gated</span>
       <span class="chip"><span class="dot"></span>UMIK-1</span>
       <span class="chip"><span class="dot"></span>SDK 3.1</span>
       <a href="presentation.html" class="chip" style="text-decoration:none">презентация →</a>
       <a href="downloads/roomscope-core.zip" class="chip" style="text-decoration:none">код проекта ↓</a>
-    </div>
+    </nav>
   </div>
 </header>
 
@@ -240,9 +37,11 @@
   <!-- HERO -->
   <section class="hero">
     <div class="reveal">
-      <div class="eyebrow">дорожная карта · вайб-кодинг MVP · 2026</div>
+      <div class="eyebrow">AR-акустика · исследовательский прототип</div>
       <h1>Слышать комнату<br><em>в пространстве.</em></h1>
-      <p class="lede">AR-калибратор, в котором очки — это рулетка координат, UMIK-1 — ухо, а ваш MacBook — мозг. Вы ходите по комнате и видите АЧХ именно там, где стоите; двигаете колонку — система помнит прошлое и рисует стрелку.</p>
+      <p class="lede">Задумка проекта: AR-калибратор, в котором очки — это рулетка координат, UMIK-1 — ухо, а ваш MacBook — мозг. Вы ходите по комнате и видите АЧХ именно там, где стоите; двигаете колонку — система помнит прошлое и рисует стрелку.</p>
+      <p class="status-note">Доступно сейчас: DSP-ядро, профили и A/B. Очки и пространственный трекинг — следующий этап. Все показания на этой странице синтетические.</p>
+      <a class="cta" href="workspace.html">Сравнить профили комнаты →</a>
       <div class="specgrid">
         <div><div class="k">хост рантайма</div><div class="v">Android · Beam Pro</div></div>
         <div><div class="k">разработка</div><div class="v">macOS · Unity + Python</div></div>
@@ -251,8 +50,9 @@
       </div>
     </div>
     <div class="scope reveal">
-      <div class="shead"><span class="t">LIVE RTA · 1/3 OCT</span><span class="lvl" id="spl">— dB SPL</span></div>
-      <canvas id="rta"></canvas>
+      <div class="shead"><span class="t">ДЕМО RTA · 1/3 OCT</span><span class="lvl" id="spl">— dB · модель</span></div>
+      <canvas id="rta" role="img" aria-label="Синтетическая частотная характеристика комнаты"></canvas>
+      <button id="motion" type="button" aria-pressed="false">Приостановить анимацию</button>
       <div class="sfoot"><span>20 Hz</span><span>200</span><span>2k</span><span>20 kHz</span></div>
     </div>
   </section>
@@ -263,14 +63,14 @@
       <span class="num">01 — ПОСЛЕДОВАТЕЛЬНОСТЬ</span>
       <div>
         <h2>Таймлайн разработки</h2>
-        <p>Каждая фаза навешивается на одно и то же ядро — ничего не переписывается. Прогресс-линия слева заполняется по мере вашего скролла.</p>
+        <p>Каждая фаза навешивается на одно и то же ядро — ничего не переписывается. Линия слева показывает положение на странице, а не готовность проекта.</p>
       </div>
     </div>
 
     <div class="tl" id="tl">
       <div class="rail"></div><div class="fill" id="tlfill"></div>
 
-      <div class="phase now done reveal">
+      <div class="phase now reveal">
         <div class="node">0</div>
         <div class="ptop"><h3>DSP-ядро на Mac</h3><span class="tag">сейчас · без железа</span></div>
         <p class="desc">Чистая инженерия на Apple Silicon. Генерация логарифмического swept sine, запись через UMIK-1, деконволюция импульсного отклика, FFT, АЧХ со сглаживанием 1/3 октавы, автопоиск проблемных частот и расчёт PEQ. Пока микрофон едет — ядро крутится на синтетике и переключается на реальность одной правкой конфига.</p>
@@ -362,7 +162,7 @@
       </svg>
 
       <!-- LAYER: АЧХ в точке -->
-      <div class="layer on" data-layer="fr">
+      <div class="layer on" aria-hidden="false" data-layer="fr">
         <div class="marker" style="left:50%;top:78%">
           <div class="ring"></div>
           <div class="lbl">LISTENER · 63 Hz −4.2 dB</div>
@@ -371,7 +171,7 @@
       </div>
 
       <!-- LAYER: галерея -->
-      <div class="layer" data-layer="gal">
+      <div class="layer" aria-hidden="true" data-layer="gal">
         <div class="marker" style="left:38%;top:64%"><div class="ring"></div><div class="lbl">P1 · +1.1</div></div>
         <div class="marker" style="left:50%;top:78%"><div class="ring"></div><div class="lbl">P2 · −4.2</div></div>
         <div class="marker" style="left:62%;top:64%"><div class="ring"></div><div class="lbl">P3 · +0.4</div></div>
@@ -380,7 +180,7 @@
       </div>
 
       <!-- LAYER: моды -->
-      <div class="layer" data-layer="modes">
+      <div class="layer" aria-hidden="true" data-layer="modes">
         <div class="blob" style="left:8%;top:30%;width:120px;height:120px;background:rgba(223,106,69,.5)"></div>
         <div class="blob" style="left:84%;top:30%;width:120px;height:120px;background:rgba(223,106,69,.5)"></div>
         <div class="blob" style="left:46%;top:24%;width:90px;height:90px;background:rgba(87,201,168,.4)"></div>
@@ -389,33 +189,33 @@
       </div>
 
       <!-- LAYER: стрелка -->
-      <div class="layer" data-layer="arrow">
+      <div class="layer" aria-hidden="true" data-layer="arrow">
         <div class="arrow" style="left:34.5%;top:50%">
           <svg viewBox="0 0 46 46"><path d="M6 23 H34 M26 14 L36 23 L26 32" fill="none" stroke="#e0913f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div class="cap">+18 cm от стены → мода −3 dB</div>
         </div>
-        <div class="hud" style="left:50%;top:88%;transform:translateX(-50%);color:var(--amber);text-align:center">A/B · layout B лучше на 2.4 dB RMS</div>
+        <div class="hud" style="left:50%;top:88%;transform:translateX(-50%);color:var(--amber);text-align:center">A/B · layout B различается на 2.4 dB RMS</div>
       </div>
 
       <!-- HUD -->
-      <div class="hud tl">
-        <div>6DoF <span class="ok">● LOCKED</span></div>
+      <div class="hud top-left">
+        <div>6DoF <span class="ok">○ DEMO</span></div>
         <div>x <span class="val" id="cx">1.20</span>  y <span class="val" id="cy">0.40</span>  z <span class="val" id="cz">1.18</span></div>
         <div>anchor <span class="ok">spk_L_01</span></div>
         <canvas class="hudlive" id="hudlive"></canvas>
       </div>
       <div class="hud tr">
-        <div>mic <span class="ok">UMIK-1 ✓</span></div>
+        <div>mic <span class="ok">не подключён</span></div>
         <div>RTA 1/3 oct · 48 kHz</div>
         <div>score <span class="val" id="score">0.82</span></div>
       </div>
-      <div class="hud bl">ROOM·SCOPE v0.1 · profile: living_room_v3</div>
+      <div class="hud bl">МАКЕТ · living_room_v3</div>
 
       <div class="ctrls" id="ctrls">
-        <button class="on" data-layer="fr">АЧХ</button>
-        <button data-layer="gal">галерея</button>
-        <button data-layer="modes">моды</button>
-        <button data-layer="arrow">стрелка</button>
+        <button class="on" aria-pressed="true" data-layer="fr">АЧХ</button>
+        <button aria-pressed="false" data-layer="gal">галерея</button>
+        <button aria-pressed="false" data-layer="modes">моды</button>
+        <button aria-pressed="false" data-layer="arrow">стрелка</button>
       </div>
       <div class="scan"></div><div class="vig"></div>
     </div>
@@ -434,10 +234,10 @@
     <div class="hw reveal">
       <div class="card"><span class="st buy">купить</span>
         <div class="role">spatial-основа</div><h4>Air 2 Ultra</h4>
-        <div class="why">Единственные с полной developer-таблицей: 6DoF, anchor, plane, depth mesh из коробки.</div></div>
+        <div class="why">Выбраны для проверки возможностей SDK: 6DoF, anchor, plane, depth mesh из коробки.</div></div>
       <div class="card"><span class="st gate">gated</span>
         <div class="role">android-хост</div><h4>Beam Pro</h4>
-        <div class="why">Рантайм 6DoF при ходьбе + второй Type-C под микрофон. Покупаем по готовности билда.</div></div>
+        <div class="why">Кандидат в Android-хосты. Одновременную работу очков и USB-микрофона нужно подтвердить на устройстве; второй порт не считаем USB audio без проверки.</div></div>
       <div class="card"><span class="st buy">купить</span>
         <div class="role">измеритель</div><h4>UMIK-1</h4>
         <div class="why">Калиброванный, без речевой обработки. Встроенный микрофон очков для АЧХ не годится.</div></div>
@@ -445,7 +245,7 @@
         <div class="role">мозг</div><h4>MacBook M</h4>
         <div class="why">Вся математика, Unity Editor, профили. Питает очки как дисплей при отладке.</div></div>
     </div>
-    <div class="never reveal">НИКОГДА в этой связке: <b>XREAL Eye</b> (Ultra не нужен) · <b>1S / ROG R1 / One Pro</b> (нет в spatial-таблице разработчика или проигрывают по depth/plane/anchor).</div>
+    <div class="never reveal">Совместимость проверяем по <a href="https://docs.xreal.com/XREALDevices/XREAL%20Glasses">официальной таблице XREAL</a>. Native AR-билда в репозитории пока нет.</div>
   </section>
 
 </main>
@@ -453,150 +253,11 @@
 <footer>
   <div class="wrap">
     <span>ROOM·SCOPE — personal build · не для монетизации</span>
-    <span>stack: Python 3.11 · SciPy · Unity 2022.3 LTS · XREAL SDK 3.1</span>
-    <span>compiled 2026-07-28</span>
+    <span>stack: Python 3.11 · SciPy · Unity / XREAL SDK — план интеграции</span>
+    <span>обновлено 2026-10-05</span>
   </div>
 </footer>
 
-<script>
-(function(){
-  "use strict";
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- ambient canvas ---------- */
-  var ac = document.getElementById('ambient'), ax = ac.getContext('2d');
-  function sizeAmbient(){ ac.width = innerWidth; ac.height = innerHeight; }
-  sizeAmbient(); addEventListener('resize', sizeAmbient);
-  var t = 0;
-  function ambient(){
-    ax.clearRect(0,0,ac.width,ac.height);
-    var w = ac.width, h = ac.height;
-    // faint dot grid drifting
-    ax.fillStyle = 'rgba(236,233,225,0.025)';
-    var g = 46, ox = (t*6)%g;
-    for(var x=-g+ox; x<w; x+=g){ for(var y=0; y<h; y+=g){ ax.fillRect(x,y,1,1); } }
-    // slow baseline waveform near bottom
-    ax.beginPath(); ax.strokeStyle='rgba(87,201,168,0.10)'; ax.lineWidth=1;
-    var by = h*0.86;
-    for(var i=0;i<=w;i+=6){ var v=Math.sin(i*0.012+t*1.3)*10+Math.sin(i*0.03+t*0.7)*5; if(i===0)ax.moveTo(i,by+v); else ax.lineTo(i,by+v); }
-    ax.stroke();
-    t+=0.012; if(!reduce) requestAnimationFrame(ambient);
-  }
-  ambient();
-
-  /* ---------- hero RTA ---------- */
-  var rta = document.getElementById('rta'), rx = rta.getContext('2d');
-  var BARS = 31, vals = new Array(BARS), targets = new Array(BARS);
-  // realistic-ish room curve: bass hump ~60-80Hz, mid dip, treble roll
-  function roomTarget(i){
-    var f = 20*Math.pow(1000, i/(BARS-1)); // 20..20000
-    var hump = 9*Math.exp(-Math.pow((Math.log2(f)-6.2)/1.1,2));      // ~75Hz room mode
-    var dip  = -5*Math.exp(-Math.pow((Math.log2(f)-8.5)/1.4,2));     // ~360Hz dip
-    var roll = -Math.max(0,(Math.log2(f)-12))*2.2;                   // treble roll
-    return 60 + hump + dip + roll;
-  }
-  for(var i=0;i<BARS;i++){ vals[i]=roomTarget(i); targets[i]=roomTarget(i); }
-  function sizeRta(){ var r=rta.getBoundingClientRect(); rta.width=r.width*devicePixelRatio; rta.height=r.height*devicePixelRatio; rx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
-  sizeRta(); addEventListener('resize', sizeRta);
-  function drawRta(){
-    var w=rta.width/devicePixelRatio, h=rta.height/devicePixelRatio;
-    rx.clearRect(0,0,w,h);
-    // gridlines
-    rx.strokeStyle='rgba(236,233,225,0.05)'; rx.lineWidth=1;
-    for(var gy=0;gy<=4;gy++){ var yy=h*gy/4; rx.beginPath(); rx.moveTo(0,yy); rx.lineTo(w,yy); rx.stroke(); }
-    var bw = w/BARS, min=30, max=90;
-    // bars
-    for(var i=0;i<BARS;i++){
-      if(Math.random()<0.08) targets[i]=roomTarget(i)+(Math.random()-0.5)*4;
-      vals[i]+=(targets[i]-vals[i])*0.18;
-      var n=(vals[i]-min)/(max-min); n=Math.max(0,Math.min(1,n));
-      var bh=n*h, x=i*bw+bw*0.18, bww=bw*0.64;
-      var hot = vals[i]>66;
-      rx.fillStyle = hot ? 'rgba(224,145,63,0.55)' : 'rgba(87,201,168,0.42)';
-      rx.fillRect(x, h-bh, bww, bh);
-      rx.fillStyle = hot ? 'rgba(224,145,63,0.95)' : 'rgba(87,201,168,0.95)';
-      rx.fillRect(x, h-bh, bww, 2);
-    }
-    // smooth curve overlay
-    rx.beginPath(); rx.strokeStyle='rgba(236,233,225,0.5)'; rx.lineWidth=1.4;
-    for(var j=0;j<BARS;j++){ var n2=(vals[j]-min)/(max-min); n2=Math.max(0,Math.min(1,n2)); var px=j*bw+bw/2, py=h-n2*h; if(j===0)rx.moveTo(px,py); else rx.lineTo(px,py); }
-    rx.stroke();
-    var avg=vals.reduce(function(a,b){return a+b},0)/BARS;
-    document.getElementById('spl').textContent = avg.toFixed(1)+' dB SPL';
-    if(!reduce) requestAnimationFrame(drawRta);
-  }
-  drawRta();
-
-  /* ---------- mini FR in marker ---------- */
-  function spark(canvasId, color, seed){
-    var c=document.getElementById(canvasId); if(!c) return;
-    var x=c.getContext('2d');
-    function fit(){ var r=c.getBoundingClientRect(); c.width=r.width*devicePixelRatio; c.height=r.height*devicePixelRatio; x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
-    fit();
-    var ph=seed||0;
-    function d(){
-      var w=c.width/devicePixelRatio,h=c.height/devicePixelRatio; x.clearRect(0,0,w,h);
-      x.beginPath(); x.strokeStyle=color; x.lineWidth=1.2;
-      for(var i=0;i<=w;i+=3){ var v=Math.sin(i*0.18+ph)*0.25+Math.sin(i*0.05+ph*0.5)*0.35; var y=h*0.5+v*h*0.4; if(i===0)x.moveTo(i,y); else x.lineTo(i,y); }
-      x.stroke(); ph+=0.05; if(!reduce)requestAnimationFrame(d);
-    }
-    d(); addEventListener('resize',fit);
-  }
-  spark('miniFR','#57c9a8',0);
-
-  /* ---------- hud live line ---------- */
-  (function(){
-    var c=document.getElementById('hudlive'); if(!c)return;
-    var x=c.getContext('2d'), ph=2;
-    function fit(){ var r=c.getBoundingClientRect(); c.width=r.width*devicePixelRatio; c.height=r.height*devicePixelRatio; x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
-    fit(); addEventListener('resize',fit);
-    function d(){ var w=c.width/devicePixelRatio,h=c.height/devicePixelRatio; x.clearRect(0,0,w,h);
-      x.beginPath(); x.strokeStyle='#57c9a8'; x.lineWidth=1;
-      for(var i=0;i<=w;i+=2){ var v=Math.sin(i*0.25+ph)*0.3+Math.sin(i*0.07+ph*1.7)*0.3; var y=h/2+v*h*0.4; if(i===0)x.moveTo(i,y); else x.lineTo(i,y);} x.stroke();
-      ph+=0.12; if(!reduce)requestAnimationFrame(d);} d();
-  })();
-
-  /* ---------- ticking 6DoF coords ---------- */
-  var bx=1.20, by2=0.40, bz=1.18;
-  setInterval(function(){
-    if(reduce) return;
-    document.getElementById('cx').textContent=(bx+(Math.random()-0.5)*0.02).toFixed(2);
-    document.getElementById('cy').textContent=(by2+(Math.random()-0.5)*0.02).toFixed(2);
-    document.getElementById('cz').textContent=(bz+(Math.random()-0.5)*0.01).toFixed(2);
-    document.getElementById('score').textContent=(0.82+(Math.random()-0.5)*0.02).toFixed(2);
-  },420);
-
-  /* ---------- AR layer switching ---------- */
-  var ctrls=document.getElementById('ctrls'), ar=document.getElementById('ar');
-  ctrls.addEventListener('click',function(e){
-    var b=e.target.closest('button'); if(!b)return;
-    var L=b.getAttribute('data-layer');
-    [].forEach.call(ctrls.children,function(x){x.classList.toggle('on',x===b)});
-    [].forEach.call(ar.querySelectorAll('.layer'),function(l){ l.classList.toggle('on', l.getAttribute('data-layer')===L); });
-  });
-
-  /* ---------- reveal on scroll ---------- */
-  var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} }); },{threshold:0.15});
-  [].forEach.call(document.querySelectorAll('.reveal'),function(el){io.observe(el)});
-
-  /* ---------- timeline fill + dotnav spy ---------- */
-  var tl=document.getElementById('tl'), fill=document.getElementById('tlfill');
-  var sections=['top','timeline','final','hardware'].map(function(id){return document.getElementById(id)});
-  var dots=[].slice.call(document.querySelectorAll('#dotnav a'));
-  function onScroll(){
-    if(tl){
-      var r=tl.getBoundingClientRect(), vh=innerHeight;
-      var total=r.height, passed=Math.min(Math.max(vh*0.5-r.top,0),total);
-      fill.style.height=(passed/total*100)+'%';
-    }
-    var cur=sections[0];
-    sections.forEach(function(s){ if(s && s.getBoundingClientRect().top< innerHeight*0.4) cur=s; });
-    dots.forEach(function(d){ d.classList.toggle('on', d.getAttribute('data-s')===cur.id); });
-  }
-  var ticking=false;
-  addEventListener('scroll',function(){ if(!ticking){ ticking=true; requestAnimationFrame(function(){ onScroll(); ticking=false; }); } });
-  onScroll();
-})();
-</script>
+<script type="module" src="assets/roadmap.js"></script>
 </body>
 </html>
