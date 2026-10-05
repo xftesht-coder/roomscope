@@ -1,20 +1,193 @@
 <!doctype html>
 <html lang="ru">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="RoomScope: локальная лаборатория акустических профилей и сравнения расстановок колонок."><title>RoomScope — лаборатория АЧХ</title><link rel="stylesheet" href="assets/workspace.css"></head>
-<body>
-<a class="skip" href="#main">К содержимому</a>
-<header><a class="brand" href="index.html">ROOM<span>·</span>SCOPE</a><nav aria-label="Основная навигация"><a href="index.html">Проект и AR</a><a href="presentation.html">Очки</a><a href="downloads/roomscope-core.zip" download>Скачать DSP</a></nav><span class="local">ЛОКАЛЬНАЯ ЛАБОРАТОРИЯ</span></header>
-<main id="main">
-  <section class="intro"><div><p class="eyebrow">01 / АКУСТИКА В ТОЧКЕ</p><h1>Сначала измерить.<br><span>Потом переместить.</span></h1><p class="lede">Сравните две позиции колонок или слушателя. Загрузите профили из DSP-ядра или изучите разницу на демо.</p></div><aside><span class="signal-dot"></span> ЭТАП 0 · DSP + A/B<p>Профили хранятся в этом браузере. Измерение микрофоном выполняется в Python. AR-очки пока не подключены.</p></aside></section>
-  <div class="toolbar"><button id="demo" class="primary">Загрузить демо A/B</button><a href="#instructions">Как сделать свой замер ↗</a><button id="clear" class="quiet">Очистить A/B</button></div>
-  <p id="status" role="status" aria-live="polite">Загрузите два профиля, чтобы начать сравнение.</p>
-  <section class="slots" aria-label="Профили для сравнения">
-    <article class="slot" data-slot="a"><div class="slot-head"><span class="slot-letter">A</span><h2>Исходная позиция</h2><span class="source">Нет данных</span></div><label for="label-a">Название позиции</label><input id="label-a" maxlength="120" placeholder="Например, диван · до перемещения" disabled><div class="slot-actions"><label class="upload" for="file-a">Загрузить JSON<input type="file" id="file-a" accept=".json,application/json"></label><button id="export-a" disabled>Скачать A</button></div><p class="meta">Профиль не загружен</p></article>
-    <article class="slot" data-slot="b"><div class="slot-head"><span class="slot-letter b">B</span><h2>Новая позиция</h2><span class="source">Нет данных</span></div><label for="label-b">Название позиции</label><input id="label-b" maxlength="120" placeholder="Например, колонка +18 см" disabled><div class="slot-actions"><label class="upload" for="file-b">Загрузить JSON<input type="file" id="file-b" accept=".json,application/json"></label><button id="export-b" disabled>Скачать B</button></div><p class="meta">Профиль не загружен</p></article>
-  </section>
-  <section class="chart-panel"><div class="panel-heading"><div><p class="eyebrow">ЧАСТОТНАЯ ХАРАКТЕРИСТИКА</p><h2>Что изменилось в комнате</h2></div><div class="legend"><span>A · исходная</span><span>B · новая</span></div></div><div id="empty"><p>У каждой точки — свой звук.</p><span>Загрузите профиль A или начните с демо.</span></div><svg id="chart" viewBox="0 0 960 340" role="img" aria-label="График АЧХ профилей A и B" hidden></svg><p class="chart-note">Уровень относительно sweep; это не dB SPL. Для A/B сохраняйте одинаковые уровни воспроизведения, записи и калибровку.</p><div class="metrics"><div><span>RMS-различие</span><strong id="rms">—</strong></div><div><span>Средняя дельта B − A</span><strong id="mean">—</strong></div><p>RMS показывает размер изменения, а не улучшение. Выбор позиции зависит от целевой АЧХ.</p></div></section>
-  <details id="bands"><summary>Значения по полосам и PEQ</summary><div class="table-scroll"><table><caption>АЧХ и изменение B − A, дБ</caption><thead><tr><th>Частота, Гц</th><th>A</th><th>B</th><th>Δ</th></tr></thead><tbody id="band-rows"></tbody></table></div><p id="peq">PEQ-предложения появятся после загрузки профиля.</p></details>
-  <section id="instructions" class="instructions"><p class="eyebrow">02 / ОТ КОМНАТЫ К ПРОФИЛЮ</p><h2>Ваш первый замер</h2><ol><li><strong>Подготовьте ядро.</strong> Скачайте DSP-архив и следуйте README. Синтетический прогон работает без микрофона.</li><li><strong>Сохраните позицию A.</strong> Запустите <code>python pipeline.py --out output/A --label "Позиция A"</code>. Для реального замера нужны выбранные аудиоустройства и режим real в конфигурации.</li><li><strong>Повторите в позиции B.</strong> Измените расположение, сохраните в <code>output/B</code> при тех же настройках. Загрузите оба <code>profile.json</code> выше.</li></ol><p>Демо — математическая иллюстрация, а не измерение помещения. PEQ — ограниченные предложения по срезу пиков, они не применяются к звуку автоматически. Старые профили 0.2 используют другую нормализацию и сравниваются только между собой.</p></section>
-</main><footer><span>ROOM·SCOPE / исследовательский прототип</span><a href="index.html#final">Как это будет выглядеть в очках →</a></footer>
-<noscript><p>Для загрузки и сравнения профилей включите JavaScript. DSP-ядро работает отдельно в Python.</p></noscript><script type="module" src="assets/workspace.js"></script>
-</body></html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="RoomScope: локальная лаборатория акустических профилей и сравнения расстановок колонок."
+    />
+    <title>RoomScope — лаборатория АЧХ</title>
+    <link rel="stylesheet" href="assets/workspace.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">К содержимому</a>
+    <header>
+      <a class="brand" href="index.html">ROOM<span>·</span>SCOPE</a>
+      <nav aria-label="Основная навигация">
+        <a href="index.html">Проект и AR</a><a href="presentation.html">Очки</a
+        ><a href="downloads/roomscope-core.zip" download>Скачать DSP</a>
+      </nav>
+      <span class="local">ЛОКАЛЬНАЯ ЛАБОРАТОРИЯ</span>
+    </header>
+    <main id="main">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">01 / АКУСТИКА В ТОЧКЕ</p>
+          <h1>Сначала измерить.<br /><span>Потом переместить.</span></h1>
+          <p class="lede">
+            Сравните две позиции колонок или слушателя. Загрузите профили из
+            DSP-ядра или изучите разницу на демо.
+          </p>
+        </div>
+        <aside>
+          <span class="signal-dot"></span> ЭТАП 0 · DSP + A/B
+          <p>
+            Профили хранятся в этом браузере. Измерение микрофоном выполняется в
+            Python. AR-очки пока не подключены.
+          </p>
+        </aside>
+      </section>
+      <div class="toolbar">
+        <button id="demo" class="primary">Загрузить демо A/B</button
+        ><a href="#instructions">Как сделать свой замер ↗</a
+        ><button id="clear" class="quiet">Очистить A/B</button>
+      </div>
+      <p id="status" role="status" aria-live="polite">
+        Загрузите два профиля, чтобы начать сравнение.
+      </p>
+      <section class="slots" aria-label="Профили для сравнения">
+        <article class="slot" data-slot="a">
+          <div class="slot-head">
+            <span class="slot-letter">A</span>
+            <h2>Исходная позиция</h2>
+            <span class="source">Нет данных</span>
+          </div>
+          <label for="label-a">Название позиции</label
+          ><input
+            id="label-a"
+            maxlength="120"
+            placeholder="Например, диван · до перемещения"
+            disabled
+          />
+          <div class="slot-actions">
+            <label class="upload" for="file-a"
+              >Загрузить JSON<input
+                type="file"
+                id="file-a"
+                accept=".json,application/json" /></label
+            ><button id="export-a" disabled>Скачать A</button>
+          </div>
+          <p class="meta">Профиль не загружен</p>
+        </article>
+        <article class="slot" data-slot="b">
+          <div class="slot-head">
+            <span class="slot-letter b">B</span>
+            <h2>Новая позиция</h2>
+            <span class="source">Нет данных</span>
+          </div>
+          <label for="label-b">Название позиции</label
+          ><input
+            id="label-b"
+            maxlength="120"
+            placeholder="Например, колонка +18 см"
+            disabled
+          />
+          <div class="slot-actions">
+            <label class="upload" for="file-b"
+              >Загрузить JSON<input
+                type="file"
+                id="file-b"
+                accept=".json,application/json" /></label
+            ><button id="export-b" disabled>Скачать B</button>
+          </div>
+          <p class="meta">Профиль не загружен</p>
+        </article>
+      </section>
+      <section class="chart-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">ЧАСТОТНАЯ ХАРАКТЕРИСТИКА</p>
+            <h2>Что изменилось в комнате</h2>
+          </div>
+          <div class="legend">
+            <span>A · исходная</span><span>B · новая</span>
+          </div>
+        </div>
+        <div id="empty">
+          <p>У каждой точки — свой звук.</p>
+          <span>Загрузите профиль A или начните с демо.</span>
+        </div>
+        <svg
+          id="chart"
+          viewBox="0 0 960 340"
+          role="img"
+          aria-label="График АЧХ профилей A и B"
+          hidden
+        ></svg>
+        <p class="chart-note">
+          Уровень относительно sweep; это не dB SPL. Для A/B сохраняйте
+          одинаковые уровни воспроизведения, записи и калибровку.
+        </p>
+        <div class="metrics">
+          <div><span>RMS-различие</span><strong id="rms">—</strong></div>
+          <div>
+            <span>Средняя дельта B − A</span><strong id="mean">—</strong>
+          </div>
+          <p>
+            RMS показывает размер изменения, а не улучшение. Выбор позиции
+            зависит от целевой АЧХ.
+          </p>
+        </div>
+      </section>
+      <details id="bands">
+        <summary>Значения по полосам и PEQ</summary>
+        <div class="table-scroll">
+          <table>
+            <caption>
+              АЧХ и изменение B − A, дБ
+            </caption>
+            <thead>
+              <tr>
+                <th>Частота, Гц</th>
+                <th>A</th>
+                <th>B</th>
+                <th>Δ</th>
+              </tr>
+            </thead>
+            <tbody id="band-rows"></tbody>
+          </table>
+        </div>
+        <p id="peq">PEQ-предложения появятся после загрузки профиля.</p>
+      </details>
+      <section id="instructions" class="instructions">
+        <p class="eyebrow">02 / ОТ КОМНАТЫ К ПРОФИЛЮ</p>
+        <h2>Ваш первый замер</h2>
+        <ol>
+          <li>
+            <strong>Подготовьте ядро.</strong> Скачайте DSP-архив и следуйте
+            README. Синтетический прогон работает без микрофона.
+          </li>
+          <li>
+            <strong>Сохраните позицию A.</strong> Запустите
+            <code>python pipeline.py --out output/A --label "Позиция A"</code>.
+            Для реального замера нужны выбранные аудиоустройства и режим real в
+            конфигурации.
+          </li>
+          <li>
+            <strong>Повторите в позиции B.</strong> Измените расположение,
+            сохраните в <code>output/B</code> при тех же настройках. Загрузите
+            оба <code>profile.json</code> выше.
+          </li>
+        </ol>
+        <p>
+          Демо — математическая иллюстрация, а не измерение помещения. PEQ —
+          ограниченные предложения по срезу пиков, они не применяются к звуку
+          автоматически. Старые профили 0.2 используют другую нормализацию и
+          сравниваются только между собой.
+        </p>
+      </section>
+    </main>
+    <footer>
+      <span>ROOM·SCOPE / исследовательский прототип</span
+      ><a href="index.html#final">Как это будет выглядеть в очках →</a>
+    </footer>
+    <noscript
+      ><p>
+        Для загрузки и сравнения профилей включите JavaScript. DSP-ядро работает
+        отдельно в Python.
+      </p></noscript
+    >
+    <script type="module" src="assets/workspace.js"></script>
+  </body>
+</html>

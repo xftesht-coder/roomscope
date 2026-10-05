@@ -17,11 +17,11 @@ def third_octave_smoothing(mag_db, freqs):
     freqs, mag_db = response_arrays(freqs, mag_db)
     centers = get_third_octave_centers(max(20, freqs[0]), min(20000, freqs[-1]))
     smoothed = []
-    
+
     for fc in centers:
         fl, fu = get_third_octave_edges(fc)
         mask = (freqs >= fl) & (freqs < fu)
-        
+
         if np.sum(mask) > 0:
             # Считаем среднее значение АЧХ в дБ для этой полосы
             band_values = mag_db[mask]
@@ -29,7 +29,7 @@ def third_octave_smoothing(mag_db, freqs):
             smoothed.append(avg)
         else:
             smoothed.append(float(np.interp(fc, freqs, mag_db)))
-    
+
     return np.array(smoothed), centers
 
 def calculate_frequency_response(ir, sr=48000.0, smooth=True):
@@ -52,17 +52,17 @@ if __name__ == "__main__":
     print("=" * 60)
     print("ROOM·SCOPE — 1/3 октавное сглаживание")
     print("=" * 60)
-    
+
     ir, sr = sf.read("test_ir.wav")
     print(f"IR: {len(ir)} samples, {sr} Hz")
-    
+
     smoothed_db, centers = calculate_frequency_response(ir, sr, smooth=True)
-    
+
     print(f"Полос: {len(centers)}")
     print(f"Первые 5 частот: {centers[:5]}")
     print(f"Первые 5 значений АЧХ: {smoothed_db[:5]} dB")
     print(f"АЧХ диапазон: {smoothed_db.min():.2f} ... {smoothed_db.max():.2f} dB")
-    
+
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.semilogx(centers, smoothed_db, 'o-', color='#2ca02c', linewidth=2, markersize=6)
     ax.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     ax.grid(True, which="both", ls="--", alpha=0.5)
     ax.set_xticks([20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000])
     ax.set_xticklabels(['20', '50', '100', '200', '500', '1k', '2k', '5k', '10k', '20k'])
-    
+
     plt.tight_layout()
     plt.savefig("freq_response_1_3_octave.png", dpi=150)
     print("✅ Сохранено: freq_response_1_3_octave.png")

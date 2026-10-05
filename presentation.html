@@ -1,52 +1,123 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROOM·SCOPE — на базе XREAL Air 2 Ultra</title>
-<link rel="stylesheet" href="assets/presentation.css">
-</head>
-<body>
-<nav class="wrap" aria-label="Основная навигация"><a href="index.html">← Проект</a> · <a href="workspace.html">Лаборатория</a></nav>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ROOM·SCOPE — на базе XREAL Air 2 Ultra</title>
+    <link rel="stylesheet" href="assets/presentation.css" />
+  </head>
+  <body>
+    <nav class="wrap" aria-label="Основная навигация">
+      <a href="index.html">← Проект</a> ·
+      <a href="workspace.html">Лаборатория</a>
+    </nav>
 
-<section class="page wrap">
-  <span class="num">СТР. 1 — ЖЕЛЕЗО</span>
-  <h1>Почему <em>XREAL Air 2 Ultra.</em></h1>
-  <p class="lede">ROOM·SCOPE строится на XREAL Air 2 Ultra — AR-очках для разработчиков с полным spatial-стеком «из коробки»: 6DoF-трекинг, spatial anchors, plane detection и depth mesh. Это целевая платформа для будущей интеграции; native-приложение пока не реализовано.</p>
+    <section class="page wrap">
+      <span class="num">СТР. 1 — ЖЕЛЕЗО</span>
+      <h1>Почему <em>XREAL Air 2 Ultra.</em></h1>
+      <p class="lede">
+        ROOM·SCOPE строится на XREAL Air 2 Ultra — AR-очках для разработчиков с
+        полным spatial-стеком «из коробки»: 6DoF-трекинг, spatial anchors, plane
+        detection и depth mesh. Это целевая платформа для будущей интеграции;
+        native-приложение пока не реализовано.
+      </p>
 
-  <div class="specrow">
-    <div><div class="k">дисплей</div><div class="v">Full HD × 2 глаза</div></div>
-    <div><div class="k">поле зрения</div><div class="v">52° · 42 PPD</div></div>
-    <div><div class="k">частота</div><div class="v">до 120 Hz</div></div>
-    <div><div class="k">яркость</div><div class="v">500 нит</div></div>
-    <div><div class="k">трекинг</div><div class="v">6DoF · dual 3D-сенсоры SLAM</div></div>
-    <div><div class="k">depth mesh</div><div class="v">треугольные меши + semantic labels</div></div>
-    <div><div class="k">аудио</div><div class="v">directional audio</div></div>
-    <div><div class="k">SDK</div><div class="v">XREAL SDK 3.1 (Unity)</div></div>
-  </div>
+      <div class="specrow">
+        <div>
+          <div class="k">дисплей</div>
+          <div class="v">Full HD × 2 глаза</div>
+        </div>
+        <div>
+          <div class="k">поле зрения</div>
+          <div class="v">52° · 42 PPD</div>
+        </div>
+        <div>
+          <div class="k">частота</div>
+          <div class="v">до 120 Hz</div>
+        </div>
+        <div>
+          <div class="k">яркость</div>
+          <div class="v">500 нит</div>
+        </div>
+        <div>
+          <div class="k">трекинг</div>
+          <div class="v">6DoF · dual 3D-сенсоры SLAM</div>
+        </div>
+        <div>
+          <div class="k">depth mesh</div>
+          <div class="v">треугольные меши + semantic labels</div>
+        </div>
+        <div>
+          <div class="k">аудио</div>
+          <div class="v">directional audio</div>
+        </div>
+        <div>
+          <div class="k">SDK</div>
+          <div class="v">XREAL SDK 3.1 (Unity)</div>
+        </div>
+      </div>
 
-  <div class="note">Характеристики — исходные проектные ориентиры. Совместимость SDK, хоста и USB audio необходимо проверить до покупки: <a href="https://docs.xreal.com/XREALDevices/XREAL%20Glasses">официальная документация XREAL</a>.</div>
-</section>
+      <div class="note">
+        Характеристики — исходные проектные ориентиры. Совместимость SDK, хоста
+        и USB audio необходимо проверить до покупки:
+        <a href="https://docs.xreal.com/XREALDevices/XREAL%20Glasses"
+          >официальная документация XREAL</a
+        >.
+      </div>
+    </section>
 
-<section class="page wrap">
-  <span class="num">СТР. 2 — ЗАЧЕМ ЭТО ROOM·SCOPE</span>
-  <h1>От «железа» —<br>к <em>задаче калибровки.</em></h1>
-  <p class="lede">Каждая spatial-возможность Ultra закрывает конкретную потребность прибора: не просто мерить АЧХ, а показывать её в физической точке комнаты и вести колонку к лучшей позиции.</p>
+    <section class="page wrap">
+      <span class="num">СТР. 2 — ЗАЧЕМ ЭТО ROOM·SCOPE</span>
+      <h1>От «железа» —<br />к <em>задаче калибровки.</em></h1>
+      <p class="lede">
+        Каждая spatial-возможность Ultra закрывает конкретную потребность
+        прибора: не просто мерить АЧХ, а показывать её в физической точке
+        комнаты и вести колонку к лучшей позиции.
+      </p>
 
-  <div class="why">
-    <div class="card"><h4>6DoF + Spatial Anchor</h4><p>АЧХ «висит» в точке комнаты, где стоит пользователь — не на экране, а в пространстве. Обошёл комнату — точки остаются на месте.</p></div>
-    <div class="card"><h4>Depth Mesh + semantic labels</h4><p>Геометрия стен/пола → аналитическая модель комнатных мод → стрелка размещения колонки. Без этого — просто цифровой эквалайзер, а не AR-инструмент.</p></div>
-    <div class="card"><h4>Dual 3D-сенсоры SLAM</h4><p>Устойчивый якорь при ходьбе с микрофоном на теле — необходимое условие для live RTA и A/B-сравнения расстановок.</p></div>
-    <div class="card"><h4>SDK 3.1 / Unity</h4><p>Один и тот же рендер-пайплайн проекта не переписывается между фазами дорожной карты — только донашивается новыми слоями.</p></div>
-  </div>
+      <div class="why">
+        <div class="card">
+          <h4>6DoF + Spatial Anchor</h4>
+          <p>
+            АЧХ «висит» в точке комнаты, где стоит пользователь — не на экране,
+            а в пространстве. Обошёл комнату — точки остаются на месте.
+          </p>
+        </div>
+        <div class="card">
+          <h4>Depth Mesh + semantic labels</h4>
+          <p>
+            Геометрия стен/пола → аналитическая модель комнатных мод → стрелка
+            размещения колонки. Без этого — просто цифровой эквалайзер, а не
+            AR-инструмент.
+          </p>
+        </div>
+        <div class="card">
+          <h4>Dual 3D-сенсоры SLAM</h4>
+          <p>
+            Устойчивый якорь при ходьбе с микрофоном на теле — необходимое
+            условие для live RTA и A/B-сравнения расстановок.
+          </p>
+        </div>
+        <div class="card">
+          <h4>SDK 3.1 / Unity</h4>
+          <p>
+            Один и тот же рендер-пайплайн проекта не переписывается между фазами
+            дорожной карты — только донашивается новыми слоями.
+          </p>
+        </div>
+      </div>
 
-  <div class="note">Прочие модели линейки (<b>XREAL Eye</b>, <b>One / One Pro</b>) сознательно исключены — либо нет depth mesh/plane detection в developer-таблице, либо нет полного 6DoF. Подробности — в дорожной карте проекта.</div>
-</section>
+      <div class="note">
+        Прочие модели линейки (<b>XREAL Eye</b>, <b>One / One Pro</b>)
+        сознательно исключены — либо нет depth mesh/plane detection в
+        developer-таблице, либо нет полного 6DoF. Подробности — в дорожной карте
+        проекта.
+      </div>
+    </section>
 
-<footer class="wrap">
-  <span>ROOM·SCOPE — personal build</span>
-  <span><a href="roadmap.html">← дорожная карта проекта</a></span>
-</footer>
-
-</body>
+    <footer class="wrap">
+      <span>ROOM·SCOPE — personal build</span>
+      <span><a href="roadmap.html">← дорожная карта проекта</a></span>
+    </footer>
+  </body>
 </html>

@@ -1,0 +1,11 @@
+node_modules
+.venv
+dist
+public/downloads
+test-results
+playwright-report
+.test-tmp
+roomscope-core/output
+roomscope-core/profiles
+.ruff_cache
+.pytest_cache
